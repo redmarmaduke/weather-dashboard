@@ -36,60 +36,60 @@
                 </div>
             </form>
             <ul id="location_history" class="list-group">
-                <li class="list-group-item">Austin</li>
             </ul>
         </div>
         <div class="col-10 pl-0">
             <div class="jumbotron jumbotron-fluid px-4 border bg-white">
-                <h1 class="display-5">
-                    <p>Atlanta (8/15/2019)</p><img src="#" />
+                <h1 class="display-5 d-flex align-items-center">
+                    <p id="today_city_date" class="mb-1">-------- (--/--/--)</p>
+                    <img id="today_img" width="70" src="" />
                 </h1>
 
-                <p>Temperature: 90.9 &degF</p>
-                <p>Humidity: 41%</p>
-                <p>Wind Speed: 4.7 MPH</p>
-                <p>UV Index: 9.49</p>
+                <p id="today_temperature">Temperature: 90.9 &degF</p>
+                <p id="today_humidity">Humidity: 41%</p>
+                <p id="today_wind_speed">Wind Speed: 4.7 MPH</p>
+                <p id="today_uv_index">UV Index: 9.49</p>
             </div>
             <h2 class="display-5">5-Day Forecast:</h2>
             <div class="d-flex justify-content-start">
-                <div class="card mr-4 bg-primary text-white">
+                <div class="forecast-item card mr-4 bg-primary text-white">
                     <div class="card-body">
-                        <h5 class="card-title">8/16/2019</h5>
-                        <img src="">
-                        <p class="card-text">Temp: 86.85 &degF</p>
-                        <p class="card-text">Humidity: 4.3%</p>
+                        <h5 class="forecast-date card-title">--/--/----</h5>
+                        <img class="forecast-image" width="35" src="">
+                        <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
+                        <p class="forecast-humidity card-text">Humidity: --.-%</p>
                     </div>
                 </div>
-                <div class="card mr-4 bg-primary text-white">
+                <div class="forecast-item card mr-4 bg-primary text-white">
                     <div class="card-body">
-                        <h5 class="card-title">8/16/2019</h5>
-                        <img src="">
-                        <p class="card-text">Temp: 86.85 &degF</p>
-                        <p class="card-text">Humidity: 4.3%</p>
+                        <h5 class="forecast-date card-title">--/--/----</h5>
+                        <img class="forecast-image" width="35" src="">
+                        <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
+                        <p class="forecast-humidity card-text">Humidity: --.-%</p>
                     </div>
                 </div>
-                <div class="card mr-4 bg-primary text-white">
+                <div class="forecast-item card mr-4 bg-primary text-white">
                     <div class="card-body">
-                        <h5 class="card-title">8/16/2019</h5>
-                        <img src="">
-                        <p class="card-text">Temp: 86.85 &degF</p>
-                        <p class="card-text">Humidity: 4.3%</p>
+                        <h5 class="forecast-date card-title">--/--/----</h5>
+                        <img class="forecast-image" width="35" src="">
+                        <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
+                        <p class="forecast-humidity card-text">Humidity: --.-%</p>
                     </div>
                 </div>
-                <div class="card  mr-4 bg-primary text-white">
+                <div class="forecast-item card  mr-4 bg-primary text-white">
                     <div class="card-body">
-                        <h5 class="card-title">8/16/2019</h5>
-                        <img src="">
-                        <p class="card-text">Temp: 86.85 &degF</p>
-                        <p class="card-text">Humidity: 4.3%</p>
+                        <h5 class="forecast-date card-title">--/--/----</h5>
+                        <img class="forecast-image" width="35" src="">
+                        <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
+                        <p class="forecast-humidity card-text">Humidity: --.-%</p>
                     </div>
                 </div>
-                <div class="card mr-4 bg-primary text-white">
+                <div class="forecast-item card mr-4 bg-primary text-white">
                     <div class="card-body">
-                        <h5 class="card-title">8/16/2019</h5>
-                        <img src="">
-                        <p class="card-text">Temp: 86.85 &degF</p>
-                        <p class="card-text">Humidity: 4.3%</p>
+                        <h5 class="forecast-date card-title">--/--/----</h5>
+                        <img class="forecast-image" width="35" src="">
+                        <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
+                        <p class="forecast-humidity card-text">Humidity: --.-%</p>
                     </div>
                 </div>
 
@@ -111,153 +111,7 @@
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
             crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-        <script>
-            function updatePageCurrentWeather(obj) {
-                console.log(obj);
-            }
-
-            function updatePageForecast(obj) {
-                console.log(obj);
-            }
-
-            function updatePage(event) {
-                var city = $(event.target).text();
-                getCurrentWeather(city,updatePageCurrentWeather);
-                getForecast(city,updatePageForecast);
-            }
-
-            $("#submit_location").click(function(event) {
-                var location = $("#input_location").val().trim();
-                var li = $("<li>");
-                li.html("<li class=\"list-group-item\">"+location+"</li>");
-                li.click(updatePage);
-                $("#location_history").prepend(li);
-            });
-
-            /*
-             * getCurrentWeather 
-             * 
-             * @param{string} city name of city
-             * @param{function} callback takes an argument of Object in the following format
-             *  {
-             *    date: ?,
-             *    icon_url: ?,
-             *    temperature: ?,
-             *    humidity: ?,
-             *    wind_speed: ?,
-             *    uv_index: ?
-             *  }
-             *  and is executed asynchonously after the data is retrieved.
-             */
-            function getCurrentWeather(city, callback) {
-                var url, query, urlQueryComponent, queryUrl;
-
-                url = "https://api.openweathermap.org/data/2.5/weather?";
-                query = {
-                    q: city,
-                    appid: "1ca7ce78e703503786e910c2c8760a17"
-                };
-                urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
-                queryUrl = url + urlQueryComponent;
-
-                var obj = {
-                    date: "",
-                    icon_url: "",
-                    temperature: "",
-                    humidity: "",
-                    wind_speed: "",
-                    uv_index: ""
-                };
-
-                $.ajax({
-                    url: queryUrl,
-                    method: "GET"
-                }).then(function (response) {
-                    obj.date = moment(parseInt(response.dt) * 1000).format("M/D/YY");
-                    obj.icon_url = "";
-                    obj.temperature = response.main.temp;
-                    obj.humidity = response.main.humidity;
-                    obj.wind_speed = response.wind.speed;
-                    obj.icon_url = "http://openweathermap.org/img/wn/" + response.weather[0].icon + "@" + response.cod + ".png";
-
-                    url = "https://api.openweathermap.org/data/2.5/uvi/history?";
-                    query = {
-                        lat: response.coord.lat,
-                        lon: response.coord.lon,
-                        start: response.dt,
-                        end: response.dt,
-                        appid: "1ca7ce78e703503786e910c2c8760a17"
-                    };
-                    urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
-                    queryUrl = url + urlQueryComponent;
-
-                    $.ajax({
-                        url: queryUrl,
-                        method: "GET"
-                    }).then(function (response) {
-                        obj.uv_index = response[0].value;
-                        callback(obj);
-                    });
-
-                });
-            }
-
-            /*
-             * getForeCast 
-             * 
-             * @param{string} city name of city
-             * @param{function} callback takes an argument of Object in the following format
-             *  {
-             *    date: ?,
-             *    icon_url: ?,
-             *    temperature: ?,
-             *    humidity: ?,
-             *  }
-             *  and is executed asynchonously after the data is retrieved.
-             */
-            function getForecast(city, callback) {
-                var url, query, urlQueryComponent, queryUrl;
-
-                url = "http://api.openweathermap.org/data/2.5/forecast?";
-
-                query = {
-                    q: city,
-                    units: "imperial",
-                    cnt: 40,
-                    appid: "1ca7ce78e703503786e910c2c8760a17"
-                };
-
-                urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
-                queryUrl = url + urlQueryComponent;
-
-                var obj = [];
-
-                $.ajax({
-                    url: queryUrl,
-                    method: "GET"
-                }).then(function (response) {
-                    for (var i = 4; i < 40; i += 8) {
-                        obj.push({
-                            date: moment(parseInt(response.list[i].dt) * 1000).format("M/D/YY"),
-                            icon_url: "http://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + "@" + response.cod + ".png",
-                            temperature: response.list[i].main.temp,
-                            humidity: response.list[i].main.humidity
-                        });
-                    }
-                    callback(obj);
-                });
-            }
-
-            /*
-            console.log(getCurrentWeather("Austin", function (obj) {
-                console.log(obj);
-            }));
-
-            console.log(getForecast("Austin", function (obj) {
-                console.log(obj);
-            }));
-            */
-        </script>
+        <script src="assets/js/script.js"></script>
 </body>
 
 </html>
