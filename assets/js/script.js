@@ -51,7 +51,7 @@ function updatePageCurrentWeather(obj) {
     else {
         uv_color="slateblue";
     }
-    $("#today_uv_index").html("UV Index: <button class=\"btn\" style=\"background-color: "+uv_color+"; color: white;\" disabled>" + obj.uv_index+"</button>");
+    $("#today_uv_index").html("UV Index: <button class=\"btn\" style=\"background-color: "+uv_color+"; color: #efefef;\" disabled>" + obj.uv_index+"</button>");
 }
 
 function updatePageForecast(obj) {
