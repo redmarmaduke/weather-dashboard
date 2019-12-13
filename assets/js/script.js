@@ -30,21 +30,15 @@ function updatePageCurrentWeather(obj) {
         uv_color="slateblue";
     }
     $("#today_uv_index").html("UV Index: <button class=\"btn\" style=\"background-color: "+uv_color+"; color: white;\" disabled>" + obj.uv_index+"</button>");
-
-    console.log(obj);
 }
 
 function updatePageForecast(obj) {
     $(".forecast-item").children().each(function (index) {
-        console.log(index);
-        console.log(this);
         $(this).find(".forecast-date").text(obj[index].date);
         $(this).find(".forecast-image").attr("src", obj[index].icon_url);
         $(this).find(".forecast-temperature").html("Temp: " + obj[index].temperature + "&degF");
         $(this).find(".forecast-humidity").text("Humidity: " + obj[index].temperature + "%");
     });
-
-    console.log(obj);
 }
 
 function updatePageCity(city) {
@@ -65,9 +59,12 @@ function updatePageByEvent(event) {
 $("#submit_location").click(function (event) {
     var location = $("#input_location").val().trim();
     updatePageCity(location);
+    if ($("#location_history").children().length == 8) {
+        $("#location_history").children().last().remove();
+    }
     var li = $("<li>");
     li.html("<li class=\"list-group-item\">" + location + "</li>");
-    li.click(updatePageByEvent);
+    li.click(updatePageByEvent);    
     $("#location_history").prepend(li);
 });
 
