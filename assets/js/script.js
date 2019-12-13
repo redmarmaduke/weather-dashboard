@@ -7,6 +7,28 @@ else {
     updatePageCity("San Jose");
 }
 
+var locations = [];
+var local = localStorage.getItem("locations");
+if (local) {
+    locations = JSON.parse(local);
+}
+
+function updateLocationHistory(location) {
+    locations.unshift(location);
+    if (locations.length >= 8) {
+        locations.pop();
+    }
+    localStorage.setItem("locations",JSON.stringify(locations));
+
+    $("#location_history").empty();
+    for (location of locations) {
+        var li = $("<li>");
+        li.html("<li class=\"list-group-item\">" + location + "</li>");
+        li.click(updatePageByHistoryEvent);        
+        $("#location_history").append(li);
+    }
+}
+
 function updatePageCurrentWeather(obj) {
     $("#today_city_date").text(obj.city + " (" + obj.date + ")");
     $("#today_img").attr("src", obj.icon_url);
@@ -17,7 +39,7 @@ function updatePageCurrentWeather(obj) {
     if (obj.uv_index < 3) {
         uv_color="forestgreen";
     }
-    else if (obj_uv_index < 5) {
+    else if (obj.uv_index < 5) {
         uv_color="gold";
     }
     else if (obj.uv_index < 7) {
@@ -51,7 +73,7 @@ function updatePagePosition(lat,lon) {
     getForecastPosition(lat,lon, updatePageForecast);
 }
 
-function updatePageByEvent(event) {
+function updatePageByHistoryEvent(event) {
     var city = $(event.target).text();
     updatePageCity(city);
 }
@@ -59,13 +81,7 @@ function updatePageByEvent(event) {
 $("#submit_location").click(function (event) {
     var location = $("#input_location").val().trim();
     updatePageCity(location);
-    if ($("#location_history").children().length == 8) {
-        $("#location_history").children().last().remove();
-    }
-    var li = $("<li>");
-    li.html("<li class=\"list-group-item\">" + location + "</li>");
-    li.click(updatePageByEvent);    
-    $("#location_history").prepend(li);
+    updateLocationHistory(location);
 });
 
 function getCurrentWeatherCity(city, callback) {
@@ -206,6 +222,10 @@ function getForecast(query, callback) {
         url: queryUrl,
         method: "GET"
     }).then(function (response) {
+        /* 
+         * ajax gets 8 3-hr segments per day, first segment at 4 is mid-day, 
+         * +=8 for the next 3 hour segment @ the next mid-day and so on
+         */
         for (var i = 4; i < 40; i += 8) {
             obj.push({
                 city: response.name,
