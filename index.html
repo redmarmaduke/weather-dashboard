@@ -16,7 +16,7 @@
             <form class="pb-4">
                 <h5><label for="input display-5">Search for a City:</label></h5>
                 <div class="input-group">
-                    <input id="input" type="text" class="form-control" placeholder="Location">
+                    <input id="input_city" type="text" class="form-control" placeholder="Location">
 
                     <button id="button" type="button" class="btn btn-default bg-primary input-group-append">
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" class="img-fluid" width="25px"
@@ -32,7 +32,8 @@
                                     </path>
                                 </g>
                             </g>
-                        </svg> </button>
+                        </svg>
+                    </button>
                 </div>
             </form>
             <ul class="list-group">
@@ -116,8 +117,7 @@
              * getCurrentWeather 
              * 
              * @param{string} city name of city
-             *
-             * @return{Object}
+             * @param{function} callback takes an argument of Object in the following format
              *  {
              *    date: ?,
              *    icon_url: ?,
@@ -126,8 +126,9 @@
              *    wind_speed: ?,
              *    uv_index: ?
              *  }
+             *  and is executed asynchonously after the data is retrieved.
              */
-            function getCurrentWeather(city, fn) {
+            function getCurrentWeather(city, callback) {
                 var url, query, urlQueryComponent, queryUrl;
 
                 url = "https://api.openweathermap.org/data/2.5/weather?";
@@ -151,8 +152,7 @@
                     url: queryUrl,
                     method: "GET"
                 }).then(function (response) {
-                    console.log(response);
-                    obj.date = moment(parseInt(response.dt)*1000).format("M/D/YY");
+                    obj.date = moment(parseInt(response.dt) * 1000).format("M/D/YY");
                     obj.icon_url = "";
                     obj.temperature = response.main.temp;
                     obj.humidity = response.main.humidity;
@@ -169,28 +169,42 @@
                     };
                     urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
                     queryUrl = url + urlQueryComponent;
+
                     $.ajax({
                         url: queryUrl,
                         method: "GET"
                     }).then(function (response) {
-                        console.log(response);
                         obj.uv_index = response[0].value;
-                        fn(obj);
+                        callback(obj);
                     });
 
                 });
             }
 
-            function getForecast(city, fn) {
+            /*
+             * getForeCast 
+             * 
+             * @param{string} city name of city
+             * @param{function} callback takes an argument of Object in the following format
+             *  {
+             *    date: ?,
+             *    icon_url: ?,
+             *    temperature: ?,
+             *    humidity: ?,
+             *  }
+             *  and is executed asynchonously after the data is retrieved.
+             */
+            function getForecast(city, callback) {
                 var url, query, urlQueryComponent, queryUrl;
 
-                url = "http://api.openweathermap.org/data/2.5/forecast/daily?";
+                url = "http://api.openweathermap.org/data/2.5/forecast?";
                 query = {
                     q: city,
                     units: "imperial",
-                    cnt: 5,
+                    cnt: 40,
                     appid: "1ca7ce78e703503786e910c2c8760a17"
                 };
+
                 urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
                 queryUrl = url + urlQueryComponent;
 
@@ -200,16 +214,15 @@
                     url: queryUrl,
                     method: "GET"
                 }).then(function (response) {
-                    console.log("A: "+response);
-                    for (var i = 0; i < response.list.length; ++i) {
+                    for (var i = 4; i < 40; i += 8) {
                         obj.push({
-                            date: moment(parseInt(response.list[i].dt)*1000).format("M/D/YY"),
+                            date: moment(parseInt(response.list[i].dt) * 1000).format("M/D/YY"),
                             icon_url: "http://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + "@" + response.cod + ".png",
                             temperature: response.list[i].main.temp,
                             humidity: response.list[i].main.humidity
                         });
                     }
-                    fn(obj);
+                    callback(obj);
                 });
             }
 
@@ -217,7 +230,7 @@
                 console.log(obj);
             }));
 
-            console.log(getForecast("Austin", function(obj) {
+            console.log(getForecast("Austin", function (obj) {
                 console.log(obj);
             }));
         </script>
