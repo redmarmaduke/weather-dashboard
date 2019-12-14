@@ -46,8 +46,13 @@ function updatePageLocationHistory() {
 
 function updatePageCurrentWeather(obj) {
     $("#today_city_date").text(obj.city + " (" + obj.date + ")");
+    $("#today_img").empty();
+    var img = $("<img>");
+    img.attr("src", obj.icon_url);
+    $("#today_img").append(img);
+
     $("#today_img").attr("src", obj.icon_url);
-    $("#today_temperature").html("Temperature: " + obj.temperature + "&degF");
+    $("#today_temperature").html("Temperature: " + obj.temperature + "&deg;F");
     $("#today_humidity").text("Humidity: " + obj.humidity + "%");
     $("#today_wind_speed").text("Wind Speed: " + obj.wind_speed + " MPH");
     var uv_color;
@@ -72,8 +77,13 @@ function updatePageCurrentWeather(obj) {
 function updatePageForecast(obj) {
     $(".forecast-item").children().each(function (index) {
         $(this).find(".forecast-date").text(obj[index].date);
-        $(this).find(".forecast-image").attr("src", obj[index].icon_url);
-        $(this).find(".forecast-temperature").html("Temp: " + obj[index].temperature + "&degF");
+        var forecastImage = $(this).find(".forecast-image");
+        forecastImage.empty();
+        var img = $("<img>");
+        img.attr("src", obj[index].icon_url);
+        img.attr("width", 35);
+        forecastImage.append(img);
+        $(this).find(".forecast-temperature").html("Temp: " + obj[index].temperature + "&deg;F");
         $(this).find(".forecast-humidity").text("Humidity: " + obj[index].temperature + "%");
     });
 }

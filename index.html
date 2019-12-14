@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="us">
+<html lang="en">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,8 +26,7 @@
                             height="25px" viewBox="0 0 172 172" style=" fill:#000000;">
                             <g fill="none" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt"
                                 stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0"
-                                font-family="none" font-weight="none" font-size="none" text-anchor="none"
-                                style="mix-blend-mode: normal">
+                                font-family="none" font-size="none" style="mix-blend-mode: normal">
                                 <path d="M0,172v-172h172v172z" fill="none"></path>
                                 <g id="original-icon" fill="#ffffff">
                                     <path
@@ -46,16 +45,16 @@
             <div class="container-fluid m-2 p-2">
                 <div class="jumbotron jumbotron-fluid px-4 border bg-white">
                     <div class="container-fluid">
-                    <h2 class="display-5 d-flex align-items-center">
-                        <p id="today_city_date" class="mb-1">-------- (--/--/----)</p>
-                        <img id="today_img" width="70" src="" />
-                    </h2>
+                        <h2 class="display-5 d-flex align-items-center">
+                            <div id="today_city_date" class="mb-1">-------- (--/--/----)</div>
+                            <div id="today_img"></div>
+                        </h2>
 
-                    <p id="today_temperature">Temperature: --.-- &degF</p>
-                    <p id="today_humidity">Humidity: --%</p>
-                    <p id="today_wind_speed">Wind Speed: -.- MPH</p>
-                    <p id="today_uv_index">UV Index: <button class="btn" style="background-color: white; color: black;"
-                            disabled> --.- </button>
+                        <p id="today_temperature">Temperature: --.-- &degF</p>
+                        <p id="today_humidity">Humidity: --%</p>
+                        <p id="today_wind_speed">Wind Speed: -.- MPH</p>
+                        <p id="today_uv_index">UV Index: <button class="btn"
+                                style="background-color: white; color: black;" disabled> --.- </button>
                     </div>
                 </div>
                 <h2 class="display-5">5-Day Forecast:</h2>
@@ -63,7 +62,7 @@
                     <div class="forecast-item card mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
-                            <img class="forecast-image" width="35" src="">
+                            <div class="forecast-image"></div>
                             <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
@@ -71,7 +70,7 @@
                     <div class="forecast-item card mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
-                            <img class="forecast-image" width="35" src="">
+                            <div class="forecast-image"></div>
                             <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
@@ -79,7 +78,7 @@
                     <div class="forecast-item card mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
-                            <img class="forecast-image" width="35" src="">
+                            <div class="forecast-image"></div>
                             <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
@@ -87,7 +86,7 @@
                     <div class="forecast-item card  mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
-                            <img class="forecast-image" width="35" src="">
+                            <div class="forecast-image"></div>
                             <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
@@ -95,7 +94,7 @@
                     <div class="forecast-item card mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
-                            <img class="forecast-image" width="35" src="">
+                            <div class="forecast-image"></div>
                             <p class="forecast-temperature card-text">Temp: --.-- &degF</p>
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
@@ -106,6 +105,8 @@
                 <a href="https://icons8.com/icon/7695/search">Search icon by Icons8</a>
             </footer>
         </div>
+        </div>
+        
 
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
