@@ -2,13 +2,82 @@
 
 This repository of a web application that displays the weather and the forecast for a given city.
 
-## Code/object for handling local storage
+## Code/object for getting the current weather info and on completion, setting it.
 
-    Code?
+    /*
+    * getCurrentWeather 
+    * 
+    * @param{string} query 
+    * @param{function} callback takes an argument of Object in the following format
+    *  {
+    *    date: ?,
+    *    icon_url: ?,
+    *    temperature: ?,
+    *    humidity: ?,
+    *    wind_speed: ?,
+    *    uv_index: ?
+    *  }
+    *  and is executed asynchonously after the data is retrieved.
+    */
+    function getCurrentWeather(query, callback) {
+        var url, query, urlQueryComponent, queryUrl;
+
+        url = "https://api.openweathermap.org/data/2.5/weather?";
+
+        /* join the key/value pairs with "=", and then join those elements with & for use in 
+        query */
+        urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
+        queryUrl = url + urlQueryComponent;
+
+        var obj = {
+            city: "",
+            date: "",
+            icon_url: "",
+            temperature: "",
+            humidity: "",
+            wind_speed: "",
+            uv_index: ""
+        };
+
+        $.ajax({
+            url: queryUrl,
+            method: "GET"
+        }).then(function (response) {
+            obj.city = response.name;
+            obj.date = moment(parseInt(response.dt) * 1000).format("M/D/YYYY");
+            obj.icon_url = "";
+            obj.temperature = response.main.temp;
+            obj.humidity = response.main.humidity;
+            obj.wind_speed = response.wind.speed;
+            obj.icon_url = "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png";
+
+            url = "https://api.openweathermap.org/data/2.5/uvi/history?";
+            query = {
+                lat: response.coord.lat,
+                lon: response.coord.lon,
+                start: response.dt,
+                end: response.dt,
+                appid: "1ca7ce78e703503786e910c2c8760a17"
+            };
+            urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
+            queryUrl = url + urlQueryComponent;
+
+            $.ajax({
+                url: queryUrl,
+                method: "GET"
+            }).then(function (response) {
+                obj.uv_index = response[0].value;
+                callback(obj);
+            });
+
+        });
+    }
+
 
 ## Image example of the web page:
 
-![Example](assets/img/screenshot.PNG)
+![Main](assets/img/main.PNG)
+![Narrow](assets/img/narrow.PNG)
 
 ## Getting Started
 

@@ -149,6 +149,8 @@ function getCurrentWeather(query, callback) {
 
     url = "https://api.openweathermap.org/data/2.5/weather?";
 
+    /* join the key/value pairs with "=", and then join those elements with & for use in 
+       query */
     urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
     queryUrl = url + urlQueryComponent;
 
