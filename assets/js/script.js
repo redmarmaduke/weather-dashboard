@@ -1,27 +1,42 @@
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-        updatePagePosition(position.coords.latitude,position.coords.longitude);
-    });
-}
-else {
-    updatePageCity("San Jose");
-}
-
 var locations = [];
-var local = localStorage.getItem("locations");
-if (local) {
-    locations = JSON.parse(local);
+
+function main() {    
+    var local = localStorage.getItem("locations");
+    if (local) {
+        locations = JSON.parse(local);
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            updatePagePosition(position.coords.latitude,position.coords.longitude);
+            updatePageLocationHistory();
+
+        });
+    }
+    else {
+        updatePageCity("San Jose");
+        updatePageLocationHistory();
+    }
 }
 
-function updateLocationHistory(location) {
+
+function addLocationHistory(location) {
+    if (location.length === 0) {
+        return;
+    }
+
     locations.unshift(location);
     if (locations.length >= 8) {
         locations.pop();
     }
-    localStorage.setItem("locations",JSON.stringify(locations));
 
+    localStorage.setItem("locations",JSON.stringify(locations));
+    updatePageLocationHistory();
+}
+
+function updatePageLocationHistory() {
     $("#location_history").empty();
-    for (location of locations) {
+    for (var location of locations) {
         var li = $("<li>");
         li.html("<li class=\"list-group-item\">" + location + "</li>");
         li.click(updatePageByHistoryEvent);        
@@ -80,8 +95,7 @@ function updatePageByHistoryEvent(event) {
 
 $("#submit_location").click(function (event) {
     var location = $("#input_location").val().trim();
-    updatePageCity(location);
-    updateLocationHistory(location);
+    addLocationHistory(location);
 });
 
 function getCurrentWeatherCity(city, callback) {
@@ -143,12 +157,12 @@ function getCurrentWeather(query, callback) {
         method: "GET"
     }).then(function (response) {
         obj.city = response.name;
-        obj.date = moment(parseInt(response.dt) * 1000).format("M/D/YY");
+        obj.date = moment(parseInt(response.dt) * 1000).format("M/D/YYYY");
         obj.icon_url = "";
         obj.temperature = response.main.temp;
         obj.humidity = response.main.humidity;
         obj.wind_speed = response.wind.speed;
-        obj.icon_url = "http://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png";
+        obj.icon_url = "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png";
 
         url = "https://api.openweathermap.org/data/2.5/uvi/history?";
         query = {
@@ -211,7 +225,7 @@ function getForecastPosition(lat,lon,callback) {
 function getForecast(query, callback) {
     var url, query, urlQueryComponent, queryUrl;
 
-    url = "http://api.openweathermap.org/data/2.5/forecast?";
+    url = "https://api.openweathermap.org/data/2.5/forecast?";
 
     urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
     queryUrl = url + urlQueryComponent;
@@ -229,8 +243,8 @@ function getForecast(query, callback) {
         for (var i = 4; i < 40; i += 8) {
             obj.push({
                 city: response.name,
-                date: moment(parseInt(response.list[i].dt) * 1000).format("M/D/YY"),
-                icon_url: "http://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + "@2x.png",
+                date: moment(parseInt(response.list[i].dt) * 1000).format("M/D/YYYY"),
+                icon_url: "https://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + "@2x.png",
                 temperature: response.list[i].main.temp,
                 humidity: response.list[i].main.humidity
             });
@@ -238,3 +252,5 @@ function getForecast(query, callback) {
         callback(obj);
     });
 }
+
+main();

@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <title>Weather Dashboard</title>
 </head>
 
@@ -14,11 +15,11 @@
     <nav class="navbar bg-dark justify-content-center">
         <h1 class="navbar-brand text-white display-5" style="font-size: 250%;">Weather Dashboard</h1>
     </nav>
-    <div class="row">
-        <div class="col-3 bg-light pl-4 vh-100">
+    <div class="row d-flex flex-column flex-md-row">
+        <div class="col-auto col-md-3 pl-4 pb-2 h-auto search">
             <form class="pb-4">
                 <h5><label for="input_location" class="display-5">Search for a City:</label></h5>
-                <div class="input-group">
+                <div class="input-group location-history">
                     <input id="input_location" type="text" class="form-control" placeholder="Location">
                     <button id="submit_location" type="button" class="btn btn-default bg-primary input-group-append">
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" class="img-fluid" width="25px"
@@ -38,14 +39,15 @@
                     </button>
                 </div>
             </form>
-            <ul id="location_history" class="list-group">
+            <ul id="location_history" class="list-group location-history">
             </ul>
         </div>
-        <div class="col-9 p-0">
-            <div class="container m-2 p-2">
+        <div class="col-auto col-md-9 p-0">
+            <div class="container-fluid m-2 p-2">
                 <div class="jumbotron jumbotron-fluid px-4 border bg-white">
+                    <div class="container-fluid">
                     <h2 class="display-5 d-flex align-items-center">
-                        <p id="today_city_date" class="mb-1">-------- (--/--/--)</p>
+                        <p id="today_city_date" class="mb-1">-------- (--/--/----)</p>
                         <img id="today_img" width="70" src="" />
                     </h2>
 
@@ -54,10 +56,11 @@
                     <p id="today_wind_speed">Wind Speed: -.- MPH</p>
                     <p id="today_uv_index">UV Index: <button class="btn" style="background-color: white; color: black;"
                             disabled> --.- </button>
+                    </div>
                 </div>
                 <h2 class="display-5">5-Day Forecast:</h2>
-                <div class="d-flex justify-content-start">
-                    <div class="forecast-item card mr-4 bg-primary text-white">
+                <div class="container d-flex flex-wrap justify-content-start align-items-start">
+                    <div class="forecast-item card mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
                             <img class="forecast-image" width="35" src="">
@@ -65,7 +68,7 @@
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
                     </div>
-                    <div class="forecast-item card mr-4 bg-primary text-white">
+                    <div class="forecast-item card mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
                             <img class="forecast-image" width="35" src="">
@@ -73,7 +76,7 @@
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
                     </div>
-                    <div class="forecast-item card mr-4 bg-primary text-white">
+                    <div class="forecast-item card mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
                             <img class="forecast-image" width="35" src="">
@@ -81,7 +84,7 @@
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
                     </div>
-                    <div class="forecast-item card  mr-4 bg-primary text-white">
+                    <div class="forecast-item card  mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
                             <img class="forecast-image" width="35" src="">
@@ -89,7 +92,7 @@
                             <p class="forecast-humidity card-text">Humidity: --%</p>
                         </div>
                     </div>
-                    <div class="forecast-item card mr-4 bg-primary text-white">
+                    <div class="forecast-item card mr-4 mb-3 bg-primary text-white">
                         <div class="card-body">
                             <h5 class="forecast-date card-title">--/--/----</h5>
                             <img class="forecast-image" width="35" src="">
@@ -106,9 +109,6 @@
 
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-        <!--<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-            crossorigin="anonymous"></script>-->
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
             crossorigin="anonymous"></script>
