@@ -1,50 +1,6 @@
 var locations = [];
 
-function main() {    
-    var local = localStorage.getItem("locations");
-    if (local) {
-        locations = JSON.parse(local);
-    }
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            updatePagePosition(position.coords.latitude,position.coords.longitude);
-            updatePageLocationHistory();
-
-        });
-    }
-    else {
-        updatePageCity("San Jose");
-        updatePageLocationHistory();
-    }
-}
-
-
-function addLocationHistory(location) {
-    if (location.length === 0) {
-        return;
-    }
-
-    locations.unshift(location);
-    if (locations.length >= 8) {
-        locations.pop();
-    }
-
-    localStorage.setItem("locations",JSON.stringify(locations));
-    updatePageLocationHistory();
-}
-
-function updatePageLocationHistory() {
-    $("#location_history").empty();
-    for (var location of locations) {
-        var li = $("<li>");
-        li.html("<li class=\"list-group-item\">" + location + "</li>");
-        li.click(updatePageByHistoryEvent);        
-        $("#location_history").append(li);
-    }
-}
-
-function updatePageCurrentWeather(obj) {
+function updatePageCallback(obj) {
     $("#today_city_date").text(obj.city + " (" + obj.date + ")");
     $("#today_img").empty();
     var img = $("<img>");
@@ -57,80 +13,127 @@ function updatePageCurrentWeather(obj) {
     $("#today_wind_speed").text("Wind Speed: " + obj.wind_speed + " MPH");
     var uv_color;
     if (obj.uv_index < 3) {
-        uv_color="forestgreen";
+        uv_color = "forestgreen";
     }
     else if (obj.uv_index < 5) {
-        uv_color="gold";
+        uv_color = "gold";
     }
     else if (obj.uv_index < 7) {
-        uv_color="orangered";
+        uv_color = "orangered";
     }
     else if (obj.uv_index < 10) {
-        uv_color="red";
+        uv_color = "red";
     }
     else {
-        uv_color="slateblue";
+        uv_color = "slateblue";
     }
-    $("#today_uv_index").html("UV Index: <button class=\"btn\" style=\"background-color: "+uv_color+"; color: #efefef;\" disabled>" + obj.uv_index+"</button>");
-}
+    $("#today_uv_index").html("UV Index: <button class=\"btn\" style=\"background-color: " + uv_color + "; color: #efefef;\" disabled>" + obj.uv_index + "</button>");
 
-function updatePageForecast(obj) {
     $(".forecast-item").children().each(function (index) {
-        $(this).find(".forecast-date").text(obj[index].date);
+        $(this).find(".forecast-date").text(obj.forecast[index].date);
         var forecastImage = $(this).find(".forecast-image");
         forecastImage.empty();
         var img = $("<img>");
-        img.attr("src", obj[index].icon_url);
+        img.attr("src", obj.forecast[index].icon_url);
         img.attr("width", 35);
         forecastImage.append(img);
-        $(this).find(".forecast-temperature").html("Temp: " + obj[index].temperature + " &deg;F");
-        $(this).find(".forecast-humidity").text("Humidity: " + obj[index].temperature + "%");
+        $(this).find(".forecast-temperature").html("Temp: " + obj.forecast[index].temperature + " &deg;F");
+        $(this).find(".forecast-humidity").text("Humidity: " + obj.forecast[index].temperature + "%");
     });
 }
 
-function updatePageCity(city) {
-    getCurrentWeatherCity(city, updatePageCurrentWeather);
-    getForecastCity(city, updatePageForecast);
+function main() {
+    var local = localStorage.getItem("locations");
+    if (local) {
+        locations = JSON.parse(local);
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }, updatePageCallback);
+        });
+    }
+    else {
+        getWeather({ city: "San Jose" }, updatePageCallback);
+    }
 }
 
-function updatePagePosition(lat,lon) {
-    getCurrentWeatherPosition(lat,lon, updatePageCurrentWeather);
-    getForecastPosition(lat,lon, updatePageForecast);
-}
+function addLocationToHistory(location) {
+    if (location.length === 0) {
+        return;
+    }
 
-function updatePageByHistoryEvent(event) {
-    var city = $(event.target).text();
-    updatePageCity(city);
+    if (locations.includes(location)) {
+        return;
+    }
+
+    locations.unshift(location);
+    if (locations.length >= 8) {
+        locations.pop();
+    }
+
+    localStorage.setItem("locations", JSON.stringify(locations));
+
+    $("#location_history").empty();
+    for (var location of locations) {
+        var li = $("<li>");
+        li.html("<li class=\"list-group-item\">" + location + "</li>");
+        li.click(function(event) {
+            updatePage({ city: $(event.target).text() });
+        });
+        $("#location_history").append(li);
+    }
 }
 
 $("#submit_location").click(function (event) {
     var location = $("#input_location").val().trim();
-    addLocationHistory(location);
+    getWeather({ city: location }, updatePageCallback);
 });
 
-function getCurrentWeatherCity(city, callback) {
-    var query = {
-        q: city,
-        units: "imperial",
-        appid: "1ca7ce78e703503786e910c2c8760a17"
+function getAjaxSettings(queryArg, api) {
+    let query = {
+        //callback: "test",
+        id: "2172797",
+        units: "imperial"
     };
 
-    getCurrentWeather(query, callback);
-}
+    switch(api) {
+        case "weather":
+            url = "https://community-open-weather-map.p.rapidapi.com/weather?";
+            break;
+        case "history":
+            url = "https://community-open-weather-map.p.rapidapi.com/onecall/timemachine?";
+            break;
+        case "forecast":
+            url = "https://community-open-weather-map.p.rapidapi.com/forecast?";
+            break;
+        default:
+            console.log("ERROR!");
+            return;
+    }
+ 
+    query = { ...query, ...queryArg };
 
-function getCurrentWeatherPosition(lat,lon,callback) {
-    var query = {
-        lat: lat,
-        lon: lon,
-        units: "imperial",
-        appid: "1ca7ce78e703503786e910c2c8760a17"
+    var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": url,
+        "method": "GET",
+        "headers": {
+            "x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
+            "x-rapidapi-key": "0a752c614cmsh11c31506d6a7ef8p1a4272jsn3a1851718b07"
+        }
     };
 
-    getCurrentWeather(query, callback);
+    settings.url = settings.url + Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
+
+    console.log("getAjaxSettings: ",settings);
+    return settings;
 }
+
 
 /*
- * getCurrentWeather 
+ * getWeather 
  * 
  * @param{string} query 
  * @param{function} callback takes an argument of Object in the following format
@@ -140,19 +143,22 @@ function getCurrentWeatherPosition(lat,lon,callback) {
  *    temperature: ?,
  *    humidity: ?,
  *    wind_speed: ?,
- *    uv_index: ?
+ *    uv_index: ?,
+ *    forecast: [
+ *      {
+ *          date: ?,
+ *          icon_url: ?,
+ *          temperature: ?,
+ *          humidity: ?
+ *      },
+ *      ...
+ *    ]
  *  }
  *  and is executed asynchonously after the data is retrieved.
  */
-function getCurrentWeather(query, callback) {
-    var url, query, urlQueryComponent, queryUrl;
 
-    url = "https://api.openweathermap.org/data/2.5/weather?";
-
-    /* join the key/value pairs with "=", and then join those elements with & for use in 
-       query */
-    urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
-    queryUrl = url + urlQueryComponent;
+ function getWeather(query, callback) {
+    var query;
 
     var obj = {
         city: "",
@@ -164,10 +170,8 @@ function getCurrentWeather(query, callback) {
         uv_index: ""
     };
 
-    $.ajax({
-        url: queryUrl,
-        method: "GET"
-    }).then(function (response) {
+    $.ajax(getAjaxSettings(query,"weather")).then(function (response) {
+        console.log("weather: ",response);
         obj.city = response.name;
         obj.date = moment(parseInt(response.dt) * 1000).format("M/D/YYYY");
         obj.icon_url = "";
@@ -176,92 +180,63 @@ function getCurrentWeather(query, callback) {
         obj.wind_speed = response.wind.speed;
         obj.icon_url = "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png";
 
-        url = "https://api.openweathermap.org/data/2.5/uvi/history?";
+
         query = {
             lat: response.coord.lat,
             lon: response.coord.lon,
-            start: response.dt,
-            end: response.dt,
-            appid: "1ca7ce78e703503786e910c2c8760a17"
+            //start: response.dt,
+            //end: response.dt //
+            dt: response.dt
         };
-        urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
-        queryUrl = url + urlQueryComponent;
 
-        $.ajax({
-            url: queryUrl,
-            method: "GET"
-        }).then(function (response) {
-            obj.uv_index = response[0].value;
-            callback(obj);
+        $.ajax(getAjaxSettings({...query, cnt: 40 },"history")).then(function (response) {
+            console.log("history: ",response);
+
+            obj.uv_index = response.current.uvi;
+
+            obj.forecast = [];
+
+            // remove dt from query
+            delete query.dt;
+
+            /*
+             * getForecast 
+             * 
+             *  forecast {
+             *    date: ?,
+             *    icon_url: ?,
+             *    temperature: ?,
+             *    humidity: ?,
+             *  }
+             */
+            let settings = getAjaxSettings({...query, cnt: 40},"forecast"); 
+            let then_fn = function (response) {
+                console.log("forecast: ",response);
+
+                /* 
+                 * ajax gets 8 3-hr segments per day, first segment at 4 is mid-day, 
+                 * +=8 for the next 3 hour segment @ the next mid-day and so on
+                 */
+                for (var i = 4; i < 40; i += 8) {
+                    console.log(response.list[i].main);
+                    obj.forecast.push({
+                        city: response.name,
+                        date: moment(parseInt(response.list[i].dt) * 1000).format("M/D/YYYY"),
+                        icon_url: "https://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + "@2x.png",
+                        temperature: response.list[i].main.temp,
+                        humidity: response.list[i].main.humidity
+                    });
+                }
+
+                addLocationToHistory(obj.city);
+                callback(obj);
+            };
+            let fail_fn = function (data) {
+                console.log("data: ", data);
+            };
+
+            $.ajax(settings).then(then_fn).fail(fail_fn);
         });
-
-    });
-}
-
-
-function getForecastCity(city, callback) {
-    query = {
-        q: city,
-        units: "imperial",
-        cnt: 40,
-        appid: "1ca7ce78e703503786e910c2c8760a17"
-    };
-
-    getForecast(query, callback);
-}
-
-function getForecastPosition(lat,lon,callback) {
-    query = {
-        lat: lat,
-        lon: lon,
-        units: "imperial",
-        cnt: 40,
-        appid: "1ca7ce78e703503786e910c2c8760a17"
-    };
-
-    getForecast(query, callback);
-}
-/*
- * getForecast 
- * 
- * @param{Object} query query object
- * @param{function} callback takes an argument of Object in the following format
- *  {
- *    date: ?,
- *    icon_url: ?,
- *    temperature: ?,
- *    humidity: ?,
- *  }
- *  and is executed asynchonously after the data is retrieved.
- */
-function getForecast(query, callback) {
-    var url, query, urlQueryComponent, queryUrl;
-
-    url = "https://api.openweathermap.org/data/2.5/forecast?";
-
-    urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
-    queryUrl = url + urlQueryComponent;
-
-    var obj = [];
-
-    $.ajax({
-        url: queryUrl,
-        method: "GET"
-    }).then(function (response) {
-        /* 
-         * ajax gets 8 3-hr segments per day, first segment at 4 is mid-day, 
-         * +=8 for the next 3 hour segment @ the next mid-day and so on
-         */
-        for (var i = 4; i < 40; i += 8) {
-            obj.push({
-                city: response.name,
-                date: moment(parseInt(response.list[i].dt) * 1000).format("M/D/YYYY"),
-                icon_url: "https://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + "@2x.png",
-                temperature: response.list[i].main.temp,
-                humidity: response.list[i].main.humidity
-            });
-        }
-        callback(obj);
     });
 }
 
