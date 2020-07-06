@@ -59,26 +59,30 @@ function main() {
 }
 
 function addLocationToHistory(location) {
+    console.log("adding: "+location);
     if (location.length === 0) {
         return;
     }
 
-    if (locations.includes(location)) {
-        return;
-    }
+    // capitalize the first character of every word
+    location = location.toLowerCase().split(' ').map(function(word) {
+        return word[0].toUpperCase() + word.substr(1);
+    }).join(' ');
 
-    locations.unshift(location);
-    if (locations.length >= 8) {
-        locations.pop();
-    }
+    if (!locations.includes(location)) {
 
-    localStorage.setItem("locations", JSON.stringify(locations));
+        locations.unshift(location);
+        if (locations.length >= 8) {
+            locations.pop();
+        }    
+        localStorage.setItem("locations", JSON.stringify(locations));
+    }
 
     $("#location_history").empty();
     for (var location of locations) {
         var li = $("<li>");
         li.html("<li class=\"list-group-item\">" + location + "</li>");
-        li.click(function(event) {
+        li.click(function (event) {
             updatePage({ city: $(event.target).text() });
         });
         $("#location_history").append(li);
@@ -97,7 +101,7 @@ function getAjaxSettings(queryArg, api) {
         units: "imperial"
     };
 
-    switch(api) {
+    switch (api) {
         case "weather":
             url = "https://community-open-weather-map.p.rapidapi.com/weather?";
             break;
@@ -111,7 +115,7 @@ function getAjaxSettings(queryArg, api) {
             console.log("ERROR!");
             return;
     }
- 
+
     query = { ...query, ...queryArg };
 
     var settings = {
@@ -127,7 +131,7 @@ function getAjaxSettings(queryArg, api) {
 
     settings.url = settings.url + Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
 
-    console.log("getAjaxSettings: ",settings);
+    console.log("getAjaxSettings: ", settings);
     return settings;
 }
 
@@ -157,7 +161,7 @@ function getAjaxSettings(queryArg, api) {
  *  and is executed asynchonously after the data is retrieved.
  */
 
- function getWeather(query, callback) {
+function getWeather(query, callback) {
     var query;
 
     var obj = {
@@ -170,74 +174,83 @@ function getAjaxSettings(queryArg, api) {
         uv_index: ""
     };
 
-    $.ajax(getAjaxSettings(query,"weather")).then(function (response) {
-        console.log("weather: ",response);
-        obj.city = response.name;
-        obj.date = moment(parseInt(response.dt) * 1000).format("M/D/YYYY");
-        obj.icon_url = "";
-        obj.temperature = response.main.temp;
-        obj.humidity = response.main.humidity;
-        obj.wind_speed = response.wind.speed;
-        obj.icon_url = "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png";
+    /*
+     * processForecast 
+     * 
+     *  forecast {
+     *    date: ?,
+     *    icon_url: ?, 
+     *    temperature: ?,
+     *    humidity: ?,
+     *  }
+     */
 
+    function processForecast(data, textStatus, jqXHR) {
+        console.log("forecast: ", data);
+
+        /* 
+         * ajax gets 8 3-hr segments per day, first segment at 4 is mid-day, 
+         * +=8 for the next 3 hour segment @ the next mid-day and so on
+         */
+        for (var i = 4; i < 40; i += 8) {
+            obj.forecast.push({
+                city: data.city.name,
+                date: moment(parseInt(data.list[i].dt) * 1000).format("M/D/YYYY"),
+                icon_url: "https://openweathermap.org/img/wn/" + data.list[i].weather[0].icon + "@2x.png",
+                temperature: data.list[i].main.temp,
+                humidity: data.list[i].main.humidity
+            });
+        }
+
+        addLocationToHistory(data.city.name);
+        callback(obj);
+    }
+
+    function handleProcessForecastError(jqXHR, textStatus, errorThrown) {
+        console.log("Forecast Error: ", jqXHR, textStatus, errorThrown);
+    }
+
+    function processHistory(data, textStatus, jqXHR) {
+        console.log("history: ", data);
+        obj.uv_index = data.current.uvi;
+        obj.forecast = [];
+
+        // remove dt from query
+        delete query.dt;
+
+        $.ajax(getAjaxSettings({ ...query }, "forecast")).then(processForecast, handleProcessForecastError);
+    }
+
+    function handleProcessHistoryError(jqXHR, textStatus, errorThrown) {
+        console.log("History Error: ", jqXHR, textStatus, errorThrown);
+    }
+
+    function processWeather(data, textStatus, jqXHR) {
+        console.log("weather: ", data);
+        obj.city = data.name;
+        obj.date = moment(parseInt(data.dt) * 1000).format("M/D/YYYY");
+        obj.icon_url = "";
+        obj.temperature = data.main.temp;
+        obj.humidity = data.main.humidity;
+        obj.wind_speed = data.wind.speed;
+        obj.icon_url = "https://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png";
 
         query = {
-            lat: response.coord.lat,
-            lon: response.coord.lon,
+            lat: data.coord.lat,
+            lon: data.coord.lon,
             //start: response.dt,
             //end: response.dt //
-            dt: response.dt
+            dt: data.dt
         };
 
-        $.ajax(getAjaxSettings({...query, cnt: 40 },"history")).then(function (response) {
-            console.log("history: ",response);
+        $.ajax(getAjaxSettings({ ...query }, "history")).then(processHistory,handleProcessHistoryError);
+    }
 
-            obj.uv_index = response.current.uvi;
+    function handleProcessWeatherError(jqXHR, textStatus, errorThrown) {
+        console.log("Weather Error: ", jqXHR, textStatus, errorThrown);
+    }
 
-            obj.forecast = [];
-
-            // remove dt from query
-            delete query.dt;
-
-            /*
-             * getForecast 
-             * 
-             *  forecast {
-             *    date: ?,
-             *    icon_url: ?,
-             *    temperature: ?,
-             *    humidity: ?,
-             *  }
-             */
-            let settings = getAjaxSettings({...query, cnt: 40},"forecast"); 
-            let then_fn = function (response) {
-                console.log("forecast: ",response);
-
-                /* 
-                 * ajax gets 8 3-hr segments per day, first segment at 4 is mid-day, 
-                 * +=8 for the next 3 hour segment @ the next mid-day and so on
-                 */
-                for (var i = 4; i < 40; i += 8) {
-                    console.log(response.list[i].main);
-                    obj.forecast.push({
-                        city: response.name,
-                        date: moment(parseInt(response.list[i].dt) * 1000).format("M/D/YYYY"),
-                        icon_url: "https://openweathermap.org/img/wn/" + response.list[i].weather[0].icon + "@2x.png",
-                        temperature: response.list[i].main.temp,
-                        humidity: response.list[i].main.humidity
-                    });
-                }
-
-                addLocationToHistory(obj.city);
-                callback(obj);
-            };
-            let fail_fn = function (data) {
-                console.log("data: ", data);
-            };
-
-            $.ajax(settings).then(then_fn).fail(fail_fn);
-        });
-    });
+    $.ajax(getAjaxSettings(query, "weather")).then(processWeather, handleProcessWeatherError);
 }
 
 main();
