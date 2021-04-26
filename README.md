@@ -1,133 +1,70 @@
-# Weather Dashboard
+# Getting Started with Create React App
 
-This repository of a web application that displays the weather and the forecast for a given city.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Code/object for getting the current weather info and on completion, setting it.
+## Available Scripts
 
-    /*
-    * getCurrentWeather 
-    * 
-    * @param{string} query 
-    * @param{function} callback takes an argument of Object in the following format
-    *  {
-    *    date: ?,
-    *    icon_url: ?,
-    *    temperature: ?,
-    *    humidity: ?,
-    *    wind_speed: ?,
-    *    uv_index: ?
-    *  }
-    *  and is executed asynchonously after the data is retrieved.
-    */
-    function getCurrentWeather(query, callback) {
-        var url, query, urlQueryComponent, queryUrl;
+In the project directory, you can run:
 
-        url = "https://api.openweathermap.org/data/2.5/weather?";
+### `yarn start`
 
-        /* join the key/value pairs with "=", and then join those elements with & for use in 
-        query */
-        urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
-        queryUrl = url + urlQueryComponent;
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-        var obj = {
-            city: "",
-            date: "",
-            icon_url: "",
-            temperature: "",
-            humidity: "",
-            wind_speed: "",
-            uv_index: ""
-        };
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
-        $.ajax({
-            url: queryUrl,
-            method: "GET"
-        }).then(function (response) {
-            obj.city = response.name;
-            obj.date = moment(parseInt(response.dt) * 1000).format("M/D/YYYY");
-            obj.icon_url = "";
-            obj.temperature = response.main.temp;
-            obj.humidity = response.main.humidity;
-            obj.wind_speed = response.wind.speed;
-            obj.icon_url = "https://openweathermap.org/img/wn/" + response.weather[0].icon + "@2x.png";
+### `yarn test`
 
-            url = "https://api.openweathermap.org/data/2.5/uvi/history?";
-            query = {
-                lat: response.coord.lat,
-                lon: response.coord.lon,
-                start: response.dt,
-                end: response.dt,
-                appid: "1ca7ce78e703503786e910c2c8760a17"
-            };
-            urlQueryComponent = Object.entries(query).map(a => a[0].concat("=", a[1])).join("&");
-            queryUrl = url + urlQueryComponent;
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-            $.ajax({
-                url: queryUrl,
-                method: "GET"
-            }).then(function (response) {
-                obj.uv_index = response[0].value;
-                callback(obj);
-            });
+### `yarn build`
 
-        });
-    }
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-## Image example of the web page:
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-![Main](assets/img/main.PNG)
-![Narrow](assets/img/narrow.PNG)
+### `yarn eject`
 
-## Getting Started
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-### Prerequisites
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-Git, SVN, Git Desktop or Microsoft Visual Studio or some disk drive
-space to unzip the contents of the repository.
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-### Installing
+## Learn More
 
-1) Visit https://github.com/redmarmaduke/weather-dashboard.
-2) Select the Clone or Download button
-3) Select the most appropriate format/method for download. 
-```
-ex. using the command line git tool
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-git clone https://github.com/redmarmaduke/weather-dashboard.git
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-```
+### Code Splitting
 
-4) Open up the index.html file present in your favorite browser.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-## Built With
+### Analyzing the Bundle Size
 
-* [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
-* [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
-* [JS](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-* [Moment.js](https://momentjs.com/docs/)
-* [Bootstrap](https://getbootstrap.com/docs/4.4/)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-## Deployed Link
+### Making a Progressive Web App
 
-* [See Live Site](https://redmarmaduke.github.io/weather-dashboard/)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-## Authors
+### Advanced Configuration
 
-* **Manuel Nunes** 
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-- [Link to Portfolio Site](https://redmarmaduke.github.io/weather-dashboard/)
-- [Link to Github](https://github.com/redmarmaduke/)
-- [Link to LinkedIn](https://www.linkedin.com/in/manuel-nunes-272ba31b/)
+### Deployment
 
-See also the list of [contributors](https://redmarmaduke.github.io/weather-dashboard/contributors) who participated in this project.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-## License
+### `yarn build` fails to minify
 
-This project is licensed under the MIT License
-
-## Acknowledgments
-
-* [Icon8.com Images](https://img.icons8.com/)
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

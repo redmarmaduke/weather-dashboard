@@ -64,7 +64,7 @@ function displayUVI(obj) {
     uv_color = "slateblue";
   }
   $("#today_uv_index").html(
-    'UV Index: <button class="btn" style="background-color: ' +
+    'UV Index: <button className="btn" style="background-color: ' +
       uv_color +
       '; color: #efefef;" disabled>' +
       obj.uv_index +
@@ -76,7 +76,7 @@ function displayHistory() {
   $("#location_history").empty();
   for (var location of locations) {
     var li = $("<li>");
-    li.html('<li class="list-group-item">' + location + "</li>");
+    li.html('<li className="list-group-item">' + location + "</li>");
     li.click(function (event) {
       getWeather({ q: $(event.target).text() });
     });
@@ -132,6 +132,26 @@ $("#submit_location").click(function (event) {
 });
 
 function ajax(queryArg, api) {
+  let query = {
+    units: "imperial",
+    appid: "1ca7ce78e703503786e910c2c8760a17",
+    ...queryArg
+  };
+
+  var settings = {
+    mode: 'cors',
+    method: "GET",
+  };
+
+  var url = `https://api.openweathermap.org/data/2.5/${api}?`;
+  url += Object.entries(query)
+  .map((a) => a[0].concat("=", a[1]))
+  .join("&");
+
+  return fetch(url,settings).then(resource=>resource.json());
+}
+
+function ajax_(queryArg, api) {
   let query = {
     units: "imperial",
     appid: "1ca7ce78e703503786e910c2c8760a17",
