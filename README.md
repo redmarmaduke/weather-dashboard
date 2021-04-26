@@ -2,7 +2,7 @@
 
 This is the repository of a web application that displays the weather and the forecast for a given city.
 
-## Code/object for getting the current weather info and on completion, setting it.
+## Code for retrieving the current weather info.
 ```javascript
     /*
     * getWeather 
@@ -54,14 +54,14 @@ This is the repository of a web application that displays the weather and the fo
         );
     },
     /*
-    * getUVI
+    * getForecast
     * 
     * @param{string} query { lat: latitude, lon: longitude }
     * @return{Promise} which resolves to:
     * {
     *     forecast: [
     *         city: String,
-    *         date: moment().format("M/D/YYYY"),
+    *         date: String("M/D/YYYY"),
     *         icon_url: String,
     *         temperature: Number,
     *         humidity: Number
@@ -132,7 +132,7 @@ git clone https://github.com/redmarmaduke/weather-dashboard.git
 
 * **Manuel Nunes** 
 
-- [Link to Portfolio Site](https://redmarmaduke.github.io/weather-dashboard/)
+- [Link to Portfolio Site](https://portfoleieio.herokuapp.com/)
 - [Link to Github](https://github.com/redmarmaduke/)
 - [Link to LinkedIn](https://www.linkedin.com/in/manuel-nunes-272ba31b/)
 
