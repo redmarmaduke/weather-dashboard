@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import API from './API';
@@ -33,11 +33,10 @@ function App() {
               search({ q: "San+Jose" });
             }            
         }
+        else {
+            search({q: location });
+        }
     },[]);
-
-    useEffect(() => {
-        search({q: location });
-    }, [location]);
 
     useEffect(() => {
         if (history.length) {

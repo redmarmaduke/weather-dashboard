@@ -23,41 +23,56 @@ function get(queryArg, api) {
 const obj = {
     getWeather: function (queryObject) {
         return get(queryObject, "weather").then((response) => {
-            if (response.cod && response.cod !== 200) {
-                console.log("COD!!!")
-                return {}
-            }            
-            return new Promise((resolve) => resolve({
-                city: response.name,
-                date: moment(parseInt(response.dt) * 1000).format("M/D/YYYY"),
-                temperature: response.main.temp,
-                humidity: response.main.humidity,
-                wind_speed: response.wind.speed,
-                icon_url: "https://openweathermap.org/img/wn/" +
-                    response.weather[0].icon + "@2x.png",
-                latitude: response.coord.lat,
-                longitude: response.coord.lon
-            }))
+            var weather = {};
+            if (!response.cod || response.cod === 200) {
+                var {
+                    name: city,
+                    dt,
+                    main: {
+                        temp: temperature,
+                        humidity
+                    },
+                    wind: {
+                        speed: wind_speed
+                    },
+                    weather: [{ icon }],
+                    coord: {
+                        lat: latitude,
+                        lon: longitude
+                    }
+                } = response;
+
+                weather = {
+                    city,
+                    date: moment(parseInt(dt) * 1000).format("M/D/YYYY"),
+                    temperature,
+                    humidity,
+                    wind_speed,
+                    icon_url: `https://openweathermap.org/img/wn/${icon}@2x.png`,
+                    latitude,
+                    longitude
+                };
+            }
+
+            return new Promise((resolve) => resolve(weather))
         });
     },
     getUVI: function (latitude, longitude) {
-        return get({ lat: latitude, lon: longitude }, "uvi").then((response) =>
-            new Promise((resolve) => resolve({ uv_index: response.value }))
+        return get({ lat: latitude, lon: longitude }, "uvi").then(({ value : uv_index }) =>
+            new Promise((resolve) => resolve({ uv_index }))
         );
     },
     getForecast: function (latitude, longitude) {
-        return get({ lat: latitude, lon: longitude, exclude: "minutely,hourly,current,alerts" }, "onecall").then((response) =>
+        return get({ lat: latitude, lon: longitude, exclude: "minutely,hourly,current,alerts" }, "onecall").then(({daily,name : city}) =>
             new Promise((resolve) => resolve({
-                forecast: response.daily.slice(1, 6).map((value, i) => {
+                forecast: daily.slice(1, 6).map((day) => {
                     return {
-                        city: response.name,
-                        date: moment(parseInt(response.daily[i].dt) * 1000).format("M/D/YYYY"),
+                        city,
+                        date: moment(parseInt(day.dt) * 1000).format("M/D/YYYY"),
                         icon_url:
-                            "https://openweathermap.org/img/wn/" +
-                            response.daily[i].weather[0].icon +
-                            "@2x.png",
-                        temperature: response.daily[i].temp.day,
-                        humidity: response.daily[i].humidity,
+                            `https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png`,
+                        temperature: day.temp.day,
+                        humidity: day.humidity,
                     }
                 })
             }))
